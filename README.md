@@ -80,30 +80,36 @@ When you just type `claude` with no argument, the first result opens Claude in y
 
 ## Launcher Script
 
-The plugin uses a launcher script to open Claude. By default, it expects `~/.local/bin/claude-repo`.
+The plugin uses a launcher script to open Claude. A ready-to-use script is included in this repository: `claude-repo.sh`
 
-Example script:
+### Installation
 
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
+1. Copy the launcher script to your local bin directory:
+   ```bash
+   cp claude-repo.sh ~/.local/bin/claude-repo
+   chmod +x ~/.local/bin/claude-repo
+   ```
 
-if [ $# -lt 1 ] || [ -z "$1" ]; then
-    dir="$HOME/repos"
-else
-    dir="$HOME/repos/$1"
-fi
+2. Customize it for your terminal (edit `~/.local/bin/claude-repo`):
+   ```bash
+   TERMINAL="alacritty"  # Change to: kitty, wezterm, gnome-terminal, etc.
+   ```
 
-if [ ! -d "$dir" ]; then
-    notify-send "claude-repo" "Repository not found: $dir" 2>/dev/null || true
-    exit 1
-fi
+### Customization
 
-# Customize this to your preferred terminal and setup
-exec alacritty --working-directory "$dir" -e "$HOME/.local/bin/claude"
-```
+Edit `~/.local/bin/claude-repo` to:
+- **Change the terminal**: Set `TERMINAL` to your preferred terminal emulator
+- **Add environment setup**: Insert any environment variables or startup commands before the final `exec` line
+- **Modify the repos directory**: Change `$HOME/repos` to a different location if needed
 
-You can customize this script to use your preferred terminal (Kitty, WezTerm, GNOME Terminal, etc.) and any additional environment setup you need.
+Supported terminals (change `TERMINAL=` to your choice):
+- `alacritty` (default)
+- `kitty`
+- `wezterm`
+- `gnome-terminal`
+- `xfce4-terminal`
+- `konsole`
+- Any terminal that supports `-e` or similar command execution
 
 ## Troubleshooting
 
@@ -134,12 +140,14 @@ You can customize this script to use your preferred terminal (Kitty, WezTerm, GN
 
 ```
 .
-├── main.py           # Plugin logic
-├── manifest.json     # Plugin metadata
-├── versions.json     # API version compatibility
+├── main.py            # Plugin logic
+├── manifest.json      # Plugin metadata
+├── versions.json      # API version compatibility
+├── claude-repo.sh     # Launcher script (customizable)
 ├── images/
-│   └── icon.jpg      # Plugin icon
-└── README.md         # This file
+│   └── icon.jpg       # Plugin icon
+├── LICENSE            # MIT license
+└── README.md          # This file
 ```
 
 ### Testing Changes
