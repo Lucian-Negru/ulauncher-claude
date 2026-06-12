@@ -1,0 +1,34 @@
+{
+    "required_api_version": "^2.0.0",
+    "name": "Claude in repo",
+    "description": "Launch Claude Code inside a repository under ~/repos",
+    "developer_name": "lucian",
+    "icon": "images/icon.jpg",
+    "preferences": [
+        {
+            "id": "claude_kw",
+            "type": "keyword",
+            "name": "Claude repo",
+            "default_value": "claude"
+        },
+        {
+            "id": "repos_dir",
+            "type": "input",
+            "name": "Repositories directory",
+            "default_value": "~/repos"
+        },
+        {
+            "id": "launcher_script",
+            "type": "input",
+            "name": "Launcher script",
+            "description": "Script that opens Claude Code in a given directory. It will be invoked with the repo name (empty string for no-arg).",
+            "default_value": "~/.local/bin/claude-repo"
+        },
+        {
+            "id": "result_limit",
+            "type": "input",
+            "name": "Results shown",
+            "default_value": "8"
+        }
+    ]
+}
