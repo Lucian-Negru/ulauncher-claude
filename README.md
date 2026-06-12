@@ -22,8 +22,8 @@ A fast, keyboard-driven launcher for opening [Claude Code](https://claude.com/cl
 1. Clone this repository into Ulauncher's extensions directory:
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/ulauncher-claude.git \
-  ~/.local/share/ulauncher/extensions/com.github.YOUR-USERNAME.claude
+git clone https://github.com/Lucian-Negru/ulauncher-claude.git \
+  ~/.local/share/ulauncher/extensions/com.github.lucian-negru.claude
 ```
 
 2. Restart Ulauncher (or press `Ctrl+L` to reload)
@@ -36,7 +36,7 @@ If you prefer to set it up manually:
 
 1. Create the extension directory:
 ```bash
-mkdir -p ~/.local/share/ulauncher/extensions/com.github.YOUR-USERNAME.claude
+mkdir -p ~/.local/share/ulauncher/extensions/com.github.lucian-negru.claude
 ```
 
 2. Copy the plugin files:
@@ -123,7 +123,7 @@ You can customize this script to use your preferred terminal (Kitty, WezTerm, GN
 
 - Check that the extension is installed in the correct location:
   ```bash
-  ls ~/.local/share/ulauncher/extensions/com.github.YOUR-USERNAME.claude
+  ls ~/.local/share/ulauncher/extensions/com.github.lucian-negru.claude
   ```
 - Restart Ulauncher completely
 - Check Ulauncher logs in `~/.local/share/ulauncher/logs/`
