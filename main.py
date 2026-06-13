@@ -10,6 +10,7 @@ from ulauncher.api.shared.action.RunScriptAction import RunScriptAction
 from ulauncher.api.shared.action.SetUserQueryAction import SetUserQueryAction
 
 ICON = "images/icon.jpg"
+LAUNCHER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "claude-repo.sh")
 
 
 class ClaudeRepoExtension(Extension):
@@ -22,18 +23,40 @@ def expand(path: str) -> str:
     return os.path.expanduser(os.path.expandvars(path))
 
 
-def list_repos(repos_dir: str):
-    try:
-        entries = os.listdir(repos_dir)
-    except OSError:
-        return []
-    repos = [
-        name
-        for name in entries
-        if not name.startswith(".")
-        and os.path.isdir(os.path.join(repos_dir, name))
-    ]
-    repos.sort(key=str.lower)
+def parse_dirs(raw: str):
+    dirs = []
+    for part in (raw or "").split(","):
+        part = part.strip()
+        if not part:
+            continue
+        path = expand(part)
+        if path not in dirs:
+            dirs.append(path)
+    return dirs or [expand("~/repos")]
+
+
+def launch_action(env: str, target: str) -> RunScriptAction:
+    return RunScriptAction(
+        f"#!/bin/sh\n{env}{shlex.quote(LAUNCHER)} {shlex.quote(target)} &\n", ""
+    )
+
+
+def list_repos(dirs):
+    """Return (name, path) for every repo across all directories, sorted by name."""
+    repos = []
+    seen = set()
+    for repos_dir in dirs:
+        try:
+            entries = os.listdir(repos_dir)
+        except OSError:
+            continue
+        for name in entries:
+            path = os.path.join(repos_dir, name)
+            if name.startswith(".") or path in seen or not os.path.isdir(path):
+                continue
+            seen.add(path)
+            repos.append((name, path))
+    repos.sort(key=lambda r: (r[0].lower(), r[1]))
     return repos
 
 
@@ -62,51 +85,49 @@ class KeywordQueryEventListener(EventListener):
         keyword = event.get_keyword() or prefs.get("claude_kw", "claude")
         query = (event.get_argument() or "").strip()
 
-        repos_dir = expand(prefs.get("repos_dir", "~/repos"))
-        launcher = expand(prefs.get("launcher_script", "~/.local/bin/claude-repo"))
+        repos_dirs = parse_dirs(prefs.get("repos_dir", "~/repos"))
+        terminal = (prefs.get("terminal") or "").strip()
+        env = f"TERMINAL={shlex.quote(terminal)} " if terminal else ""
         try:
             limit = max(1, int(prefs.get("result_limit", "8")))
         except ValueError:
             limit = 8
 
-        repos = list_repos(repos_dir)
+        repos = list_repos(repos_dirs)
 
         if query:
             scored = []
-            for name in repos:
+            for name, path in repos:
                 s = score(name, query)
                 if s is not None:
-                    scored.append((s, name))
+                    scored.append((s, name, path))
             scored.sort(key=lambda x: x[0])
-            matches = [name for _, name in scored[:limit]]
+            matches = [(name, path) for _, name, path in scored[:limit]]
         else:
             matches = repos[:limit]
 
         items = []
 
-        # Always offer "open in ~/repos root" as first item when query is empty
         if not query:
-            items.append(
-                ExtensionResultItem(
-                    icon=ICON,
-                    name=f"Claude in {repos_dir}",
-                    description="Launch Claude Code in the repositories root",
-                    on_enter=RunScriptAction(
-                        f"#!/bin/sh\n{shlex.quote(launcher)} &\n", ""
-                    ),
+            for repos_dir in repos_dirs:
+                if not os.path.isdir(repos_dir):
+                    continue
+                items.append(
+                    ExtensionResultItem(
+                        icon=ICON,
+                        name=f"Claude in {repos_dir}",
+                        description="Launch Claude Code in the repositories root",
+                        on_enter=launch_action(env, repos_dir),
+                    )
                 )
-            )
 
-        for name in matches:
+        for name, path in matches:
             items.append(
                 ExtensionResultItem(
                     icon=ICON,
                     name=name,
-                    description=os.path.join(repos_dir, name),
-                    on_enter=RunScriptAction(
-                        f"#!/bin/sh\n{shlex.quote(launcher)} {shlex.quote(name)} &\n",
-                        "",
-                    ),
+                    description=path,
+                    on_enter=launch_action(env, path),
                     on_alt_enter=SetUserQueryAction(f"{keyword} {name}"),
                 )
             )
@@ -116,7 +137,7 @@ class KeywordQueryEventListener(EventListener):
                 ExtensionResultItem(
                     icon=ICON,
                     name="No repositories found",
-                    description=f"Nothing in {repos_dir} matches '{query}'",
+                    description=f"Nothing matches '{query}'" if query else "No repositories configured",
                     on_enter=SetUserQueryAction(f"{keyword} "),
                 )
             )

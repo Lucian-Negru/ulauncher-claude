@@ -15,14 +15,15 @@
             "id": "repos_dir",
             "type": "input",
             "name": "Repositories directory",
+            "description": "Directory containing your repositories. List several comma-separated to search multiple roots (e.g. ~/work, ~/personal).",
             "default_value": "~/repos"
         },
         {
-            "id": "launcher_script",
+            "id": "terminal",
             "type": "input",
-            "name": "Launcher script",
-            "description": "Script that opens Claude Code in a given directory. It will be invoked with the repo name (empty string for no-arg).",
-            "default_value": "~/.local/bin/claude-repo"
+            "name": "Terminal",
+            "description": "Terminal emulator used to open Claude Code (e.g. alacritty, kitty, gnome-terminal, konsole, wezterm). Defaults to the system default terminal.",
+            "default_value": "x-terminal-emulator"
         },
         {
             "id": "result_limit",

@@ -6,7 +6,7 @@ A fast, keyboard-driven launcher for opening [Claude Code](https://claude.com/cl
 
 - **Quick repo switching** — Type `claude` + repo name to launch Claude Code in that directory
 - **Fuzzy matching** — Supports prefix, substring, and subsequence matching
-- **Configurable** — Customize the keyword, repositories directory, and launcher script
+- **Configurable** — Customize the keyword, repositories directory, and terminal
 - **No dependencies** — Works with any terminal and Claude Code setup
 
 ## Installation
@@ -51,8 +51,8 @@ cp -r . ~/.local/share/ulauncher/extensions/com.github.YOUR-USERNAME.claude/
 Open Ulauncher preferences and configure:
 
 - **Claude repo** (keyword) — The trigger keyword, default `claude`
-- **Repositories directory** — Where your repos are stored, default `~/repos`
-- **Launcher script** — Script to open Claude in a directory, default `~/.local/bin/claude-repo`
+- **Repositories directory** — Where your repos are stored, default `~/repos`. Accepts a comma-separated list to search multiple roots (e.g. `~/work, ~/personal`); each root gets its own launch entry, and the full path is shown so same-named repos stay distinct
+- **Terminal** — Terminal emulator used to open Claude Code, default `x-terminal-emulator` (the system default terminal)
 - **Results shown** — Maximum number of results to display, default `8`
 
 ## Usage
@@ -76,40 +76,29 @@ Results are sorted by match quality, so best matches appear first.
 
 ### Root Directory
 
-When you just type `claude` with no argument, the first result opens Claude in your repositories root directory (`~/repos`).
+When you just type `claude` with no argument, the top results open Claude in your repositories root directories — one entry per configured root (the **Repositories directory** preference, default `~/repos`).
 
 ## Launcher Script
 
-The plugin uses a launcher script to open Claude. A ready-to-use script is included in this repository: `claude-repo.sh`
+The plugin always uses the `claude-repo.sh` script included in this repository — there is no preference to point it elsewhere. Make sure it is executable:
 
-### Installation
+```bash
+chmod +x claude-repo.sh
+```
 
-1. Copy the launcher script to your local bin directory:
-   ```bash
-   cp claude-repo.sh ~/.local/bin/claude-repo
-   chmod +x ~/.local/bin/claude-repo
-   ```
+The terminal is chosen via the **Terminal** preference (passed to the script as the `TERMINAL` environment variable) and defaults to the system default terminal (`x-terminal-emulator`). The script knows how to invoke common terminals with the correct working-directory and command flags. Where the terminal supports tabs, Claude opens in a **new tab of the active window**:
 
-2. Customize it for your terminal (edit `~/.local/bin/claude-repo`):
-   ```bash
-   TERMINAL="alacritty"  # Change to: kitty, wezterm, gnome-terminal, etc.
-   ```
+- `ptyxis` / `x-terminal-emulator` / `gnome-terminal` — new tab (`--tab`)
+- `konsole` — new tab (`--new-tab`)
+- `kitty` — new window
+- `wezterm` — new window
+- `alacritty`, `xterm`, `xfce4-terminal`, and other `-e`-style terminals — new window (fallback)
 
 ### Customization
 
-Edit `~/.local/bin/claude-repo` to:
-- **Change the terminal**: Set `TERMINAL` to your preferred terminal emulator
-- **Add environment setup**: Insert any environment variables or startup commands before the final `exec` line
-- **Modify the repos directory**: Change `$HOME/repos` to a different location if needed
-
-Supported terminals (change `TERMINAL=` to your choice):
-- `alacritty` (default)
-- `kitty`
-- `wezterm`
-- `gnome-terminal`
-- `xfce4-terminal`
-- `konsole`
-- Any terminal that supports `-e` or similar command execution
+The script is invoked with the absolute directory to open as its first argument (the extension builds it from the **Repositories directory** preference), so the repos location is configured there — not in the script. For terminals the script doesn't recognize, or to add environment setup, edit `claude-repo.sh` in this repository:
+- **Add a terminal**: Add a `case` branch with the terminal's working-directory and command flags
+- **Add environment setup**: Insert any environment variables or startup commands before the `exec` line
 
 ## Troubleshooting
 
@@ -121,8 +110,8 @@ Supported terminals (change `TERMINAL=` to your choice):
 
 ### Claude Code doesn't launch
 
-- Check that the **Launcher script** exists and is executable
-- Run the launcher script manually to test: `~/.local/bin/claude-repo <repo-name>`
+- Check that `claude-repo.sh` in this repository is executable (`chmod +x claude-repo.sh`)
+- Run the launcher script manually to test: `./claude-repo.sh <absolute-directory>`
 - Verify that Claude Code CLI is installed and available in your PATH
 
 ### Plugin doesn't appear in Ulauncher
@@ -143,7 +132,7 @@ Supported terminals (change `TERMINAL=` to your choice):
 ├── main.py            # Plugin logic
 ├── manifest.json      # Plugin metadata
 ├── versions.json      # API version compatibility
-├── claude-repo.sh     # Launcher script (customizable)
+├── claude-repo.sh     # Launcher script (bundled, terminal-aware)
 ├── images/
 │   └── icon.jpg       # Plugin icon
 ├── LICENSE            # MIT license
