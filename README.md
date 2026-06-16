@@ -121,12 +121,6 @@ The script is invoked with the absolute directory to open as its first argument 
 └── README.md          # This file
 ```
 
-### Testing Changes
-
-1. Edit the plugin files
-2. Restart Ulauncher or press `Ctrl+L` to reload
-3. Test with `claude` keyword
-
 ### Debugging
 
 Enable debug logging in Ulauncher preferences, then check logs:
@@ -140,13 +134,7 @@ Found a bug or want to improve the plugin? PRs welcome! Some ideas:
 
 - Support for nested repository directories
 - Recent repositories tracking
-- Custom repository icons
-- Shell completion for the launcher script
 
 ## License
 
 MIT
-
-## Credits
-
-Created for quick repository navigation with Claude Code.
