@@ -17,34 +17,20 @@ A fast, keyboard-driven launcher for opening [Claude Code](https://claude.com/cl
 - Claude Code CLI installed
 - Repositories organized in a single directory (default: `~/repos`)
 
-### Quick Setup
+### Add the extension
 
-1. Clone this repository into Ulauncher's extensions directory:
+1. Open Ulauncher preferences (click the gear icon, or right-click the Ulauncher window)
+2. Go to the **Extensions** tab
+3. Click **Add extension**
+4. Paste the repository URL and confirm:
 
-```bash
-git clone https://github.com/Lucian-Negru/ulauncher-claude.git \
-  ~/.local/share/ulauncher/extensions/com.github.lucian-negru.claude
+```
+https://github.com/Lucian-Negru/ulauncher-claude
 ```
 
-2. Restart Ulauncher (or press `Ctrl+L` to reload)
+Ulauncher downloads the extension and loads it automatically. Open Ulauncher and type `claude` to see your repositories.
 
-3. Open Ulauncher and type `claude` to see available repositories
-
-### Manual Setup
-
-If you prefer to set it up manually:
-
-1. Create the extension directory:
-```bash
-mkdir -p ~/.local/share/ulauncher/extensions/com.github.lucian-negru.claude
-```
-
-2. Copy the plugin files:
-```bash
-cp -r . ~/.local/share/ulauncher/extensions/com.github.YOUR-USERNAME.claude/
-```
-
-3. Restart Ulauncher
+To update later, open the same **Extensions** tab and click the update button for the extension.
 
 ## Configuration
 
@@ -80,11 +66,7 @@ When you just type `claude` with no argument, the top results open Claude in you
 
 ## Launcher Script
 
-The plugin always uses the `claude-repo.sh` script included in this repository — there is no preference to point it elsewhere. Make sure it is executable:
-
-```bash
-chmod +x claude-repo.sh
-```
+The plugin always uses the `claude-repo.sh` script bundled with the extension — there is no preference to point it elsewhere. It ships executable, so no setup is needed after installing.
 
 The terminal is chosen via the **Terminal** preference (passed to the script as the `TERMINAL` environment variable) and defaults to the system default terminal (`x-terminal-emulator`). The script knows how to invoke common terminals with the correct working-directory and command flags. Where the terminal supports tabs, Claude opens in a **new tab of the active window**:
 
@@ -96,7 +78,7 @@ The terminal is chosen via the **Terminal** preference (passed to the script as 
 
 ### Customization
 
-The script is invoked with the absolute directory to open as its first argument (the extension builds it from the **Repositories directory** preference), so the repos location is configured there — not in the script. For terminals the script doesn't recognize, or to add environment setup, edit `claude-repo.sh` in this repository:
+The script is invoked with the absolute directory to open as its first argument (the extension builds it from the **Repositories directory** preference), so the repos location is configured there — not in the script. For terminals the script doesn't recognize, or to add environment setup, edit `claude-repo.sh` inside the installed extension directory (`~/.local/share/ulauncher/extensions/<extension-id>/`):
 - **Add a terminal**: Add a `case` branch with the terminal's working-directory and command flags
 - **Add environment setup**: Insert any environment variables or startup commands before the `exec` line
 
@@ -110,15 +92,15 @@ The script is invoked with the absolute directory to open as its first argument 
 
 ### Claude Code doesn't launch
 
-- Check that `claude-repo.sh` in this repository is executable (`chmod +x claude-repo.sh`)
-- Run the launcher script manually to test: `./claude-repo.sh <absolute-directory>`
+- Run the bundled launcher script manually to test: `./claude-repo.sh <absolute-directory>`
 - Verify that Claude Code CLI is installed and available in your PATH
 
 ### Plugin doesn't appear in Ulauncher
 
-- Check that the extension is installed in the correct location:
+- Confirm the extension is listed under Ulauncher preferences → **Extensions**; re-add the URL if it isn't
+- Check that the extension downloaded correctly:
   ```bash
-  ls ~/.local/share/ulauncher/extensions/com.github.lucian-negru.claude
+  ls ~/.local/share/ulauncher/extensions/
   ```
 - Restart Ulauncher completely
 - Check Ulauncher logs in `~/.local/share/ulauncher/logs/`
